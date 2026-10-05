@@ -1,6 +1,6 @@
-﻿namespace Calculator.Core;
+﻿namespace Calculator.Core.Operations;
 
-public abstract class BinaryOperation : Operation
+internal abstract class BinaryOperation : Operation
 {
     public override void Apply(INumberStack stack)
     {

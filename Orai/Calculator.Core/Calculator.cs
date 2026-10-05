@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Calculator.Core;
 
-namespace Calculator.Core;
-
-public class Calculator
+public sealed class Calculator
 {
     private readonly ITokenizer _tokenizer;
     private readonly INumberStack _stack;

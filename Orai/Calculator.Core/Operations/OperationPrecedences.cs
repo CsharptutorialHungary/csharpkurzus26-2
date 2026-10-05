@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Calculator.Core;
+﻿namespace Calculator.Core.Operations;
 
 internal static class OperationPrecedences
 {

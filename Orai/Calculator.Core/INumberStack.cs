@@ -1,6 +1,4 @@
-﻿using System.Security.AccessControl;
-
-namespace Calculator.Core;
+﻿namespace Calculator.Core;
 
 public interface INumberStack
 {

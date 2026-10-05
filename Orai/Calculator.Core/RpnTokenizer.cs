@@ -1,8 +1,10 @@
 ﻿using System.Globalization;
 
+using Calculator.Core.Operations;
+
 namespace Calculator.Core;
 
-internal class RpnTokenizer : ITokenizer
+internal sealed class RpnTokenizer : ITokenizer
 {
     private readonly Dictionary<string, IToken> _operators;
 

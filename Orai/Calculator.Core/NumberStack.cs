@@ -1,6 +1,6 @@
 ﻿namespace Calculator.Core;
 
-public class NumberStack : INumberStack
+internal class NumberStack : INumberStack
 {
     private readonly Stack<double> _stack = new();
 

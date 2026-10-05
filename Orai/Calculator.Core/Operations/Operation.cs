@@ -1,6 +1,6 @@
-﻿namespace Calculator.Core;
+﻿namespace Calculator.Core.Operations;
 
-public abstract class Operation : IToken
+internal abstract class Operation : IToken
 {
     public abstract void Apply(INumberStack stack);
 
