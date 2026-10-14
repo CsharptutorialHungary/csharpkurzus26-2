@@ -1,23 +1,21 @@
 ﻿namespace Calculator.Core;
 
-public sealed class Calculator
+internal sealed class Calculator(ITokenizer tokenizer, INumberStack stack) : ICalculator
 {
-    private readonly ITokenizer _tokenizer;
-    private readonly INumberStack _stack;
-
-    public Calculator()
+    public Either<double, Exception> Calculate(string input)
     {
-        _tokenizer = new RpnTokenizer();
-        _stack = new NumberStack();
-    }
-
-    public double Calculate(string input)
-    {
-        IToken[] tokens = _tokenizer.Tokenize(input);
-        foreach (IToken token in tokens)
+        try
         {
-            token.Apply(_stack);
+            IToken[] tokens = tokenizer.Tokenize(input);
+            foreach (IToken token in tokens)
+            {
+                token.Apply(stack);
+            }
+            return stack.Pop();
         }
-        return _stack.Pop();
+        catch (Exception e)
+        {
+            return e;
+        }
     }
 }

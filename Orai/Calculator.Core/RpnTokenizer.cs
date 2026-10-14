@@ -15,7 +15,7 @@ internal sealed class RpnTokenizer : ITokenizer
             { "+", new Addition() },
             { "-", new Subtraction() },
             { "*", new Multiply() },
-            { "/", new Division() }
+            { "/", new Division() },
         };
     }
 
