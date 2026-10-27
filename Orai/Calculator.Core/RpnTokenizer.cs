@@ -1,23 +1,14 @@
 ﻿using System.Globalization;
 
-using Calculator.Core.Operations;
-
 namespace Calculator.Core;
 
 internal sealed class RpnTokenizer : ITokenizer
 {
-    private readonly Dictionary<string, IToken> _operators;
+    private readonly ITokenProvider _tokenProvider;
 
-    public RpnTokenizer()
+    public RpnTokenizer(ITokenProvider tokenProvider)
     {
-        _operators = new Dictionary<string, IToken>
-        {
-            { "+", new Addition() },
-            { "-", new Subtraction() },
-            { "*", new Multiply() },
-            { "/", new Division() },
-            { "median", new Median() }
-        };
+        _tokenProvider = tokenProvider;
     }
 
     public IToken[] Tokenize(string input)
@@ -26,7 +17,7 @@ internal sealed class RpnTokenizer : ITokenizer
         List<IToken> tokens = new();
         foreach (string part in parts)
         {
-            if (_operators.TryGetValue(part, out IToken? token))
+            if (_tokenProvider.Tokens.TryGetValue(part, out IToken? token))
             {
                 tokens.Add(token);
             }

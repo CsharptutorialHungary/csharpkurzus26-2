@@ -1,5 +1,6 @@
 ﻿namespace Calculator.Core.Operations;
 
+[TokenName("-")]
 internal sealed class Subtraction : BinaryOperation
 {
     public override int Precedence { get; }
