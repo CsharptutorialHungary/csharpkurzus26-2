@@ -2,9 +2,19 @@ namespace Workouts.Core;
 
 public class WorkoutLog
 {
-    private readonly List<Workout> _workouts = [];
+    private readonly List<Workout> _workouts;
 
-    public IReadOnlyList<Workout> Workouts => _workouts;
+    public WorkoutLog()
+    {
+        _workouts = [];
+    }
+
+    public WorkoutLog(IEnumerable<Workout> workouts)
+    {
+        _workouts = [.. workouts];
+    }
+
+    public IReadOnlyList<Workout> Workouts => _workouts.AsReadOnly();
 
     public void Add(Workout workout) => _workouts.Add(workout);
     public IReadOnlyList<Workout> GetWorkouts(WorkoutCategory? filter)
