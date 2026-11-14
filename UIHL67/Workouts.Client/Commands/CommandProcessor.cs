@@ -1,36 +1,20 @@
-using Workouts.Core;
 using Workouts.Core.Exceptions;
 
 namespace Workouts.Client.Commands;
 
-public class CommandProcessor
+public class CommandProcessor(IEnumerable<ICommand> commands)
 {
+    private readonly Dictionary<string, ICommand> _commands =
+        commands.ToDictionary(c => c.Name, StringComparer.OrdinalIgnoreCase);
+
     public string Process(string input)
     {
         string[] parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+            throw new InvalidCommandException("Üres parancs");
 
-        return parts switch
-        {
-            ["add", var category, var minutes] => Add(ParseCategory(category), ParseMinutes(minutes)),
-            ["list"] => List(null),
-            ["list", var category] => List(ParseCategory(category)),
-            ["summary"] => Summary(null),
-            ["summary", var category] => Summary(ParseCategory(category)),
-            ["help"] => Help(),
-            [var command, ..] => throw new InvalidCommandException($"Ismeretlen parancs: '{command}'. Írd be: help"),
-            [] => throw new InvalidCommandException("Üres parancs"),
-        };
+        return _commands.TryGetValue(parts[0], out var command)
+            ? command.Execute(parts[1..])
+            : throw new InvalidCommandException($"Ismeretlen parancs: '{parts[0]}'. Írd be: help");
     }
-
-    private string Add(WorkoutCategory category, int minutes) => throw new NotImplementedException();
-
-    private string List(WorkoutCategory? category) => throw new NotImplementedException();
-
-    private string Summary(WorkoutCategory? category) => throw new NotImplementedException();
-
-    private string Help() => throw new NotImplementedException();
-
-    private WorkoutCategory ParseCategory(string text) => throw new NotImplementedException();
-
-    private int ParseMinutes(string text) => throw new NotImplementedException();
 }
