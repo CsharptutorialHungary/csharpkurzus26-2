@@ -17,6 +17,23 @@ public class WorkoutLog
     public IReadOnlyList<Workout> Workouts => _workouts.AsReadOnly();
 
     public void Add(Workout workout) => _workouts.Add(workout);
+
+    public Workout Remove(WorkoutCategory? filter, int position)
+    {
+        List<int> matchingIndexes = [.. _workouts
+            .Select((workout, index) => (workout, index))
+            .Where(x => filter == null || x.workout.Category == filter)
+            .Select(x => x.index)];
+
+        if (position < 1 || position > matchingIndexes.Count)
+            throw new ArgumentOutOfRangeException(nameof(position));
+
+        int index = matchingIndexes[position - 1];
+        Workout removed = _workouts[index];
+        _workouts.RemoveAt(index);
+        return removed;
+    }
+
     public IReadOnlyList<Workout> GetWorkouts(WorkoutCategory? filter)
     {
         return filter == null

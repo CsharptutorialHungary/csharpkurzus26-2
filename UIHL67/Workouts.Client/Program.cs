@@ -17,7 +17,7 @@ catch (Exception e) when (e is JsonException or IOException)
     log = new();
 }
 
-List<ICommand> commands = [new AddCommand(log, repository), new ListCommand(log), new SummaryCommand(log)];
+List<ICommand> commands = [new AddCommand(log, repository), new ListCommand(log), new SummaryCommand(log), new DeleteCommand(log, repository)];
 commands.Add(new HelpCommand(commands));
 CommandProcessor cp = new(commands);
 

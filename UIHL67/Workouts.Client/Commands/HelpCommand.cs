@@ -15,7 +15,7 @@ public class HelpCommand(IEnumerable<ICommand> commands) : ICommand
             throw new InvalidCommandException($"Használat: {Usage}");
 
         return "Parancsok:" + Environment.NewLine +
-            string.Join(Environment.NewLine, commands.Select(c => $"  {c.Usage,-25}{c.Description}")) +
+            string.Join(Environment.NewLine, commands.Select(c => $"  {c.Usage,-30}{c.Description}")) +
             Environment.NewLine + $"Kategóriák: {string.Join(", ", CategoryParser.All)}";
     }
 }
