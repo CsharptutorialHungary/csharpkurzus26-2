@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json;
 
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +15,7 @@ public class HttpServer : IDisposable
     private readonly TcpListener _server;
     private readonly SemaphoreSlim _semaphore;
     private readonly CancellationTokenSource _cancellationTokenSource;
+    private readonly List<IRequestHandler> _handlers;
     private bool _disposed;
 
     public HttpServer(int port, ILoggerFactory loggerFactory)
@@ -26,6 +28,12 @@ public class HttpServer : IDisposable
         _server = new TcpListener(IPAddress.Any, _port);
         _semaphore = new SemaphoreSlim(10);
         _cancellationTokenSource = new CancellationTokenSource();
+        _handlers = new List<IRequestHandler>();
+    }
+
+    public void RegisterHandler(IRequestHandler handler)
+    {
+        _handlers.Add(handler);
     }
 
     ~HttpServer()
@@ -92,7 +100,14 @@ public class HttpServer : IDisposable
         try
         {
             HttpRequest request = await HttpRequestParser.ParseAsync(stream, _port);
-
+            foreach (var handler in _handlers)
+            {
+                if (await handler.Handle(request, stream, token))
+                {
+                    _logger.LogInformation("Running handler: {handler}", handler.GetType());
+                    return;
+                }
+            }
             _logger.LogWarning("Not found: {url}", request.Path);
             await SpecialHandlers.HandleNotFound(stream);
         }
@@ -213,4 +228,48 @@ public sealed class HttpRequest
 
     public override string ToString()
         => $"{Method} {Path} {Version}";
+}
+
+public interface IRequestHandler
+{
+    Task<bool> Handle(HttpRequest request, NetworkStream responseStream, CancellationToken cancellationToken);
+}
+
+public abstract class JsonRequestHandler<TResponse> : IRequestHandler
+{
+    private readonly string _requestPath;
+
+    public JsonRequestHandler(string reqestPath)
+    {
+        _requestPath = reqestPath;
+    }
+
+    protected abstract Task<(TResponse response, HttpStatusCode responseCode)> Handle(HttpRequest request);
+
+    public async Task<bool> Handle(HttpRequest request, NetworkStream responseStream, CancellationToken cancellationToken)
+    {
+        if (request.Path.LocalPath != _requestPath)
+            return false;
+
+        (TResponse response, HttpStatusCode responseCode) response = await Handle(request);
+
+        string json = JsonSerializer.Serialize(response.response, JsonSerializerOptions.Web);
+
+        string httpResponse = $"""
+            HTTP/1.1 {(int)response.responseCode} {response.responseCode}
+            Date: {DateTime.UtcNow:R}
+            Content-Type: application/json; charset=utf-8
+            Content-Length: {Encoding.UTF8.GetByteCount(json)}
+
+            {json}
+            """;
+
+        var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+
+        using StreamWriter writer = new StreamWriter(responseStream, encoding, leaveOpen: true);
+
+        await writer.WriteAsync(httpResponse);
+
+        return true;
+    }
 }
