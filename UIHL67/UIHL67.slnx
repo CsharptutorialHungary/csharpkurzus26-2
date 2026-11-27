@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Workouts.Client/Workouts.Client.csproj" />
+  <Project Path="Workouts.Core/Workouts.Core.csproj" />
+</Solution>
